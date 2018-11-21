@@ -24,7 +24,7 @@ if __name__ == "__main__":
                  'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa',
                  'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa', 'bb', 'xiaozi', 'aa', 'bb']
     start_time = time.time()
-    pool = threadpool.ThreadPool(200)
+    pool = threadpool.ThreadPool(400)
     requests = threadpool.makeRequests(sayhello, name_list)
     [pool.putRequest(req) for req in requests]
     pool.wait()
