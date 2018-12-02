@@ -1,8 +1,11 @@
 ### 多进程条件下的python日志打印问题
 - 办法
 > pip install ConcurrentLogHandler
+
 > wget https://pypi.python.org/packages/fd/e5/0dc4f256bcc6484d454006b02f33263b20f762a433741b29d53875e0d763/ConcurrentLogHandler-0.9.1.tar.gz#md5=9609ecc4c269ac43f0837d89f12554c3
+
 > cd ConcurrentLogHandler-0.9.1
+
 > python2.7 setup.py install
 
 ```python
