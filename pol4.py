@@ -8,11 +8,10 @@ from log_test import init_log
 def do_fun(que, index):
     if que.empty():
         return
-    name_list = que.get()
-    log = init_log("child")
+    name = que.get()
+    log = init_log("child:{}".format(index))
     pid = os.getpid()
-    for name in name_list:
-        log.info("pid:{},child index:{},name:{}".format(pid, index, name))
+    log.info("pid:{},child index:{},name:child-{}".format(pid, index, name))
     return
 
 
@@ -23,14 +22,14 @@ if __name__ == "__main__":
                  'qq', 'rr', 'ss', 'tt', 'uu']
 
     log = init_log("main")
-    pool = Pool(processes=20)
-    que = Manager().Queue(20)
+    pool = Pool(processes=800)
+    que = Manager().Queue(8000)
     start_time = time.time()
-    for i in range(0, 20):
+    for i in range(0, 20000):
         while que.full():
             time.sleep(20)
         log.debug("main index:{}".format(i))
-        que.put(name_list)
+        que.put(i)
         pool.apply_async(do_fun, (que, i, ))
     pool.close()
     pool.join()
