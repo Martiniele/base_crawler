@@ -14,19 +14,20 @@ from logging import getLogger, Formatter
 from cloghandler import ConcurrentRotatingFileHandler
 
 
-def init_log(name):
-    logfile = "./log/restful_api_thread.log"
-    filesize = 800 * 1024 * 1024
-    log = getLogger(name)
-    rotate_handler = ConcurrentRotatingFileHandler(logfile, "a", filesize, encoding="utf-8")
-
-    datefmt_str = '%Y-%m-%d %H:%M:%S'
-    format_str = '[%(asctime)s][%(levelname)s] %(message)s'
-    formatter = Formatter(format_str, datefmt_str)
+def init_log(module_name, sub_name):
+    log_dir = './logs'
+    ensure_dir(log_dir)
+    log_file = '%s/desimartini_crawler_%s.log' % (log_dir, module_name.lower())
+    file_size = 800 * 1024 * 1024
+    rotate_handler = ConcurrentRotatingFileHandler(log_file, "a", file_size, backupCount=9, encoding="utf-8")
+    date_fmt_str = '%Y-%m-%d %H:%M:%S'
+    format_str = '[%(asctime)s][%(process)s][%(module)s:%(lineno)s %(funcName)s()][%(levelname)s] %(message)s'
+    formatter = logging.Formatter(format_str, date_fmt_str)
     rotate_handler.setFormatter(formatter)
-
-    log.addHandler(rotate_handler)
-    log.setLevel(logging.DEBUG)
-    return log
+    logger = logging.getLogger(sub_name)
+    if not logger.handlers:
+        logger.addHandler(rotate_handler)
+        logger.setLevel(logging.DEBUG)
+    return logger
 
 ```
