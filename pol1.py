@@ -1,5 +1,6 @@
 import time
 import json
+import codecs
 
 def sayhello(str):
     print "Hello ", str
