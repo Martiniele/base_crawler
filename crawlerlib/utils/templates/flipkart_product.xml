@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template> 
+  <encoding>utf8</encoding>  
+  <url_pattern>https://www.flipkart.com/.*pid=.*</url_pattern> 
+  <raw target='raw' array_type="elem">
+          <regex match='findall'>(window.__INITIAL_STATE__\s*=\s*{.*}};)</regex>
+          <regex match='findall'>({.*}};)</regex>
+          <strip></strip>
+          <replace pattern=';'></replace>
+  </raw> 
+  <match target="title" array_type="elem"> 
+    <jpath>$..breadcrumbs[(@.length-1)].title</jpath> 
+  </match>  
+  <match target="category"> 
+    <jpath>$..breadcrumbs[:-1].title</jpath>  
+    <drop_empty></drop_empty> 
+  </match>
+  <match target="out_of_stock" array_type='elem'>
+          <jpath>$..displayState..text</jpath>
+          <mapping map2='1' match='search'>Out Of Stock</mapping>
+          </match> 
+  <match target="in_stock" array_type='elem'>
+          <jpath>$..displayState..text</jpath>
+          <mapping map2='1' match='search'>IN_STOCK</mapping>
+  </match> 
+     <match target='questioncount' data_type='int' array_type='elem'>
+            <jpath>$..pageDataV4..data.questions[*]</jpath>
+            <length></length>
+    </match> 
+  <match target="price" data_type='float' array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_PAGE_SUMMARY")]..pricing..finalPrice.decimalValue</jpath> 
+  </match>  
+  <match target="mrp" data_type='float' array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_PAGE_SUMMARY")]..pricing..mrp.decimalValue</jpath> 
+  </match>  
+  <match target="discount" data_type='int' array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_PAGE_SUMMARY")]..pricing..totalDiscount</jpath> 
+  </match>  
+  <match target="mrp" data_type='float' array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_PAGE_SUMMARY")]..pricing..prices[0].decimalValue</jpath> 
+  </match>  
+  <match target="ratingscore" data_type='float' array_type="elem" limit='1'> 
+    <jpath>$..rating.average</jpath> 
+  </match>  
+  <match target="scorebase" data_type='float' array_type="elem" limit='1'> 
+    <jpath>$..rating.base</jpath> 
+  </match>  
+  <match target="ratingcount" data_type='int' array_type="elem" limit='1'> 
+    <jpath>$..rating.count</jpath> 
+  </match>  
+  <match target="reviewcount" data_type='int' array_type="elem" limit='1'> 
+    <jpath>$..rating.reviewCount</jpath> 
+  </match>  
+  <match target="seller_list_url" array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="SELLER")]..footer..url</jpath>  
+    <prefix>https://www.flipkart.com</prefix> 
+  </match>
+   <dict target="products" key="id"> 
+    <jpath>$..swatchComponent..products</jpath>  
+    <match target="url" array_type="elem"> 
+      <jpath>$.productUrl</jpath>  
+      <prefix>https://www.flipkart.com</prefix> 
+    </match> 
+  </dict>  
+  <dict target="products" key="id" array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="COMPOSED_SWATCH")]..products</jpath>  
+    <match target="url"> 
+      <jpath>$.productUrl</jpath>  
+      <prefix>https://www.flipkart.com</prefix> 
+    </match> 
+  </dict> 
+  <match target="image"> 
+          <jpath>$..multimediaComponents[*].value.url</jpath> 
+             <replace pattern="{@width}/{@height}/"></replace>  
+    <replace pattern="?q={@quality}"></replace> 
+  </match>  
+  <match target="product_id" array_type="elem" limit='1'> 
+    <jpath>$..productDetailsAnnouncement..productId</jpath> 
+  </match>  
+  <match target="Brand" array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_PAGE_SUMMARY")]..titleComponent..superTitle</jpath> 
+  </match>  
+  <match target="Brand" array_type="elem"> 
+    <jpath>$..productBrand[0]</jpath> 
+  </match>  
+  <match target="avaliable_info" array_type="elem"> 
+    <jpath>$..urgencyMessage</jpath> 
+  </match>  
+  <match target="is_assure" data_type='int' array_type="elem"> 
+          <jpath>$..fassuredCard.text</jpath>
+          <length></length>
+  </match>  
+  <match target="deliver" array_type="elem"> 
+          <jpath>$..deliveryMessages[*].value['text','dateText','subtext']</jpath> 
+          <drop_empty></drop_empty>
+          <connect> </connect>
+  </match>  
+  <match target="support" array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_SERVICES")]..data.actions[*].text</jpath>  
+    <drop_empty></drop_empty>  
+    <connect>\n</connect> 
+  </match>  
+  <match target="payment_option" array_type="elem"> 
+    <jpath>$..paymentOptions[*].value.text</jpath>  
+    <jpath>$..offerInfo..offers[*].value.title</jpath>  
+    <drop_empty></drop_empty>
+    <connect>\n</connect>
+  </match>  
+  <match target="seller_name" array_type="elem"> 
+    <jpath>$..SellerMetaValue..value.name</jpath> 
+  </match>  
+  <match target="seller_url" array_type="elem"> 
+    <jpath>$..SellerMetaValue..url</jpath>  
+    <prefix>https://www.flipkart.com</prefix> 
+  </match>  
+  <match target="seller_ratingscore" data_type='float' array_type="elem"> 
+    <jpath>$..sellerRating</jpath> 
+  </match>  
+  <match target="seller_support" array_type="elem"> 
+          <jpath>$..SellerMetaValue..displayText</jpath>
+          <drop_empty></drop_empty>
+          <connect>\n</connect> 
+  </match>  
+  <match target="description" array_type="elem"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.viewType=="description")]..renderableComponents..text</jpath>  
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="RPD")]..overview..text</jpath>
+    <drop_empty></drop_empty>
+    <connect>\n</connect> 
+  </match>  
+  <match target="feature_bullets" array_type="elem"> 
+    <jpath>$..featureSetList[*].features[*]..text</jpath>  
+    <jpath>$..highlights..text[*]</jpath>  
+    <drop_empty></drop_empty>
+    <connect>\n</connect> 
+  </match>  
+  <struct target="product_property_values"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_DETAILS")]..specification[*]</jpath>  
+    <match target="name" array_type="elem"> 
+      <jpath>$.name</jpath> 
+    </match>  
+    <match target="value" array_type="elem"> 
+      <jpath>$.values[0]</jpath> 
+    </match> 
+  </struct>  
+   <struct target="product_property_values"> 
+    <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_SPECIFICATION")]..renderableComponents[*]..attributes[*]</jpath>  
+    <match target="name" array_type="elem"> 
+      <jpath>$.name</jpath> 
+    </match>  
+    <match target="value" array_type="elem"> 
+      <jpath>$.values[0]</jpath> 
+    </match> 
+  </struct>  
+</template>

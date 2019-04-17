@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template>
+    <encoding>utf8</encoding>
+    <url_pattern>https://www.flipkart.com/sellers*</url_pattern>
+    <struct target='seller_list'>
+        <xpath>//div[@class='_3pZJne']</xpath>
+        <match target='seller_name' array_type='elem'>
+        <xpath>./div/div[1]/span/text()</xpath>
+        </match>
+        <match target='seller_ratingscore' data_type='float' array_type='elem'>
+                <xpath>./div/div[2]/text()</xpath>
+                                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='payment_options' array_type='elem'>
+                <xpath>.//div[@class="bGdFF8"]//span/text()</xpath>
+                            <drop_empty></drop_empty>
+            <connect>\n</connect>
+        </match>
+        <match target='price' data_type='float' array_type='elem'>
+                <xpath>.//div[@class="_1vC4OE"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='mrp' data_type='float' array_type='elem'>
+                <xpath>.//div[@class="_3auQ3N"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='is_assure' data_type='int' array_type='elem'>
+                <xpath>.//div[@class="_4XkTo6"]/img/@src</xpath>
+                <length></length>
+        </match>
+        <match target='emi_info' array_type='elem'>
+                <xpath> .//span[@class="_2iX4-z"]/text()|.//div[@class='_3pZJne']//span[@class="_2iX4-z"]/span/text()</xpath>
+                                            <drop_empty></drop_empty>
+            <connect>\n</connect>
+        </match>
+        <match target='offer_info' array_type='elem'>
+                <xpath>.//div[@class="_1TMJxN"]/text()</xpath>
+                                            <drop_empty></drop_empty>
+            <connect>\n</connect>
+        </match>
+        <match target='deliver' array_type='elem'>
+                <xpath>.//div[@class="_29Zp1s"]/text()</xpath>
+                                            <drop_empty></drop_empty>
+            <connect>\n</connect>
+        </match>
+        <match target="in_stock" data_type='int' array_type='elem'>
+                <xpath>.//button[@type="button"]/text()</xpath>
+                <length></length>
+        </match>
+</struct>
+        <match target='product_callback_url' array_type='elem'>
+                <xpath>//div[@class="_2tw077"]/a/@href</xpath>
+                <prefix>https://www.flipkart.com</prefix>
+        </match>
+            <match target='product_id' array_type='elem'>
+            <xpath>@raw_url</xpath>
+            <regex match='search'>(pid=\w+)</regex>
+            <split index='1'>=</split>
+        </match>
+
+</template> 

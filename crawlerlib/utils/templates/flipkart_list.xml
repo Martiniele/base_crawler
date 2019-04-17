@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template>
+    <encoding>utf8</encoding>
+    <url_pattern>https://www.flipkart.com/*</url_pattern>
+    <raw target='raw' array_type="elem">
+          <regex match='findall'>(window.__INITIAL_STATE__\s*=\s*{.*}};)</regex>
+          <regex match='findall'>({.*}};)</regex>
+          <strip></strip>
+          <replace pattern=';'></replace>
+  </raw> 
+
+  <struct target="pageLink">
+        <jpath>$..navigationPages[*]</jpath>
+        <match target='param' array_type='elem'>
+                <jpath>$.param</jpath>
+        </match>
+        <match target='number' data_type='int' array_type='elem'>
+          <jpath>$.number</jpath>
+        </match>   
+</struct>
+    <match target='next_url' array_type='elem'>
+            <jpath>$..seoPagination.nextUrl</jpath>
+            <prefix>https://www.flipkart.com</prefix>
+    </match>
+    <match target='pageCur' data_type='int' array_type='elem'>
+            <jpath>$..currentPage</jpath>
+    </match> 
+     <struct target='item_list'>
+        <jpath>$..pageDataV4.page.data.*[?(@.widget.type=="PRODUCT_SUMMARY")]</jpath>
+        <match target='url' array_type='elem'>
+        <jpath>$..baseUrl</jpath>
+        <prefix>https://www.flipkart.com</prefix>
+        </match>
+        <match target='id' array_type='elem'>
+        <jpath>$..value.id</jpath>
+        </match>
+        <match target='title' array_type='elem'>
+        <jpath>$..title</jpath>
+        </match>
+    </struct>   
+</template>

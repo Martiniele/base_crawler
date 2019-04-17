@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template>
+    <encoding>utf8</encoding>
+    <url_pattern>https://www.amazon.in/.*</url_pattern>
+    <raw target='raw' array_type="elem">
+          <regex match='search' connector='@'>(\'colorImages\': { \'initial\'.*}]},\n)</regex> 
+          <split index='0'>@</split>
+          <regex match='findall'>({.*}]})</regex>
+          <replace pattern="'initial'">"initial"</replace>
+    </raw>
+    <match target='image'>
+            <jpath>$.initial[*].hiRes</jpath>
+    </match>
+    <match target='image'>
+            <jpath>$.initial[*].large</jpath>
+    </match>
+    <match target='product_id' array_type='elem'>
+            <xpath>@raw_url</xpath>
+            <regex match='search'>(dp/\w+)</regex>
+            <split index='1'>/</split>
+    </match>
+    <match target='product_id' array_type='elem'>
+            <xpath>@raw_url</xpath>
+            <regex match='search'>(offer-listing/\w+)</regex>
+            <split index='1'>/</split>
+    </match>
+    <match target='title' array_type='elem'>
+        <xpath>//div[@id="centerCol"]//div[@id="titleSection"]/h1/span/text()</xpath>
+    </match>
+    <match target='category'>
+            <xpath>//span[@class="a-list-item"]/a/text()</xpath>
+            <drop_empty></drop_empty>
+    </match>
+    <match target='seller_name' array_type='elem' limit='1'>
+            <xpath>//div[@id="shipsFromSoldBy_feature_div"]//div[@id="merchant-info"]//text()</xpath>
+            <drop_reg>(Sold by)</drop_reg>
+    </match>
+    <match target='seller_ratingscore' data_type='float' array_type='elem'>
+            <xpath>//div[@id="shipsFromSoldBy_feature_div"]/div/text()</xpath>
+            <regex  match='findall' connector='@'>([0-9.]+)</regex>
+            <split index='0'>@</split>
+    </match> 
+    <match target='seller_url' array_type='elem'>
+            <xpath>//div[@id="shipsFromSoldBy_feature_div"]/div/a/@href</xpath>
+            <prefix>https://www.amazon.in</prefix>
+    </match>
+        <match target='seller_id' array_type='elem'>
+                <xpath>//div[@id="shipsFromSoldBy_feature_div"]/div/a/@href</xpath>
+                <regex match='search'>(seller=\w+)</regex>
+                <split index='1'>=</split> 
+        </match> 
+    <match target='seller_list_url' array_type='elem'>
+            <xpath>//div[@id='moreBuyingChoices_feature_div']//span[@id='mbc-olp-link']/a/@href</xpath>
+            <prefix>https://www.amazon.in</prefix>
+    </match> 
+    <match target='seller_list_url' array_type='elem'>
+            <xpath>//div[@id='olp_feature_div']//span/a/@href</xpath>
+            <prefix>https://www.amazon.in</prefix>
+    </match> 
+    <match target='avaliable_info' array_type='elem'>
+            <xpath>//div[@id='availability']/span/text()</xpath>
+            <drop_empty></drop_empty>
+            <connect>\n</connect>
+    </match> 
+    <match target='in_stock' array_type='elem'>
+            <xpath>//div[@id='availability']/span/text()</xpath>
+            <drop_empty></drop_empty>
+            <connect>\n</connect>
+            <mapping map2='1' match='search'>In stock</mapping>
+    </match> 
+    <match target='out_of_stock' array_type='elem'>
+            <xpath>//div[@id='availability']/span/text()</xpath>
+            <drop_empty></drop_empty>
+            <connect>\n</connect>
+            <mapping map2='1' match='search'>out of stock</mapping>
+    </match>  
+    <match target='feature_bullets' array_type='elem'>
+            <xpath>//div[@id="feature-bullets"]//ul/li//text()</xpath>
+            <drop_empty></drop_empty>
+            <connect>\n</connect>
+    </match>
+    <struct target='products'>
+        <xpath>//option[@class="dropdownAvailable"]</xpath>
+        <match target='id' array_type='elem'>
+                <xpath>./@value</xpath>
+                <split index='1'>,</split>
+        </match>
+        <match target='title' array_type='elem'>
+        <xpath>./text()</xpath>
+</match>
+        <match target='url' array_type='elem'>
+                <xpath>./@value</xpath>
+                <split index='1'>,</split>
+                <prefix>https://www.amazon.in/dp/</prefix>
+                <suffix>?th=1&amp;psc=1</suffix>
+        </match>
+
+    </struct>
+    <struct target='products'>
+        <xpath>//li[@class="swatchAvailable"]</xpath>
+        <match target='url' array_type='elem'>
+        <xpath>./@data-dp-url</xpath>
+        <prefix>https://www.amazon.in</prefix>
+        <suffix>&amp;th=1&amp;psc=1</suffix>
+        </match>
+        <match target='id' array_type='elem'>
+        <xpath>./@data-defaultasin</xpath>
+        </match>
+        <match target='title' array_type='elem'>
+        <xpath>./@title</xpath>
+        </match>
+    </struct>
+    <match target='highlights' array_type='elem'>
+            <xpath>//div[@id="promotions_feature_div"]//span[@class="a-list-item"]/span/text()</xpath>
+            <drop_empty></drop_empty>
+            <drop_reg>terms and conditions</drop_reg>
+            <connect>\n</connect>
+    </match>
+    <match target='highlights' array_type='elem'>
+            <xpath>//div[@id="promotions_feature_div"]//table//tr//ul/li/text()</xpath>
+            <drop_empty></drop_empty>
+            <drop_reg>terms and conditions</drop_reg>
+            <connect>\n</connect>
+    </match> 
+    <match target='description' array_type='elem'>
+            <xpath>//div[@id="productDescription"]//p/text()</xpath>
+    </match>
+        <match target='ratingscore' data_type='float' array_type='elem' limit='1'>
+                <xpath>//span[@data-hook="rating-out-of-text"]/text()</xpath>
+                <regex>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='reviewcount' data_type='int' array_type='elem'>
+                <xpath>//span[@id="acrCustomerReviewText"]/text()</xpath>
+                <regex>([0-9,]+)</regex>
+                <replace pattern=','></replace>
+</match>
+        <match target='questioncount' data_type='int' array_type='elem'>
+                <xpath>//div[@id="ask_feature_div"]//span[@class="a-size-base"]/text()</xpath>
+                <regex>([0-9,]+)</regex>
+                <replace pattern=','></replace>
+    </match>
+    <match target='payment_option' array_type='elem'>
+            <xpath>//span[@id="cod_eligible_message"]/b/text()|//div[@id="inemi_feature_div"]/span/text()</xpath>
+            <drop_empty></drop_empty>
+            <connect>\n</connect> 
+    </match>
+    <match target='free_delivery' array_type='elem'>
+            <xpath>//span[@id="price-shipping-message"]/b/text()</xpath>
+    </match>
+    <match target='deliver' array_type='elem'>
+            <xpath>//span[@id="price-shipping-message"]/b/text()</xpath>
+            <xpath>//div[@id="ddmDeliveryMessage"]//text()</xpath>
+            <xpath>//div[@id="ourprice_shippingmessage"]/span//b/text()</xpath>
+            <drop_empty></drop_empty>
+            <connect> </connect> 
+    </match>
+    <match target='support' array_type='elem'>
+            <xpath>//span[@id="productSupportAndReturnPolicy-return-policy-celWidget"]//a/text()</xpath>
+            <drop_empty></drop_empty>
+            <connect>\n</connect>
+    </match>
+        <match target='price' data_type='float' array_type='elem'>
+                <xpath>//div[@id='olp_feature_div']//span[@class="a-color-price"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match> 
+        <match target='price' data_type='float' array_type='elem'>
+                <xpath>//div[@id="unifiedPrice_feature_div"]//span[@id="priceblock_ourprice"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='price' data_type='float' array_type='elem'>
+                <xpath>//div[@id="unifiedPrice_feature_div"]//span[@id="priceblock_saleprice"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='mrp' array_type='elem' data_type='float'>
+                <xpath>//div[@id="unifiedPrice_feature_div"]//span[@class="a-text-strike"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='discount' array_type='elem' data_type='int'>
+                <xpath>//div[@id="unifiedPrice_feature_div"]//tr[@id="regularprice_savings"]/td/text()</xpath>
+                <regex  match='findall'>([0-9]+%)</regex>
+                <regex  match='findall'>([0-9]+)</regex>
+        </match>
+        <match target='price' data_type='float' array_type='elem'>
+                <xpath>//div[@id="unifiedPrice_feature_div"]//span[@id="priceblock_dealprice"]/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+    <match target='title' array_type='elem'>
+        <xpath>//*[@id="productTitle"]/text()</xpath>
+    </match>
+    <match target='Brand' array_type='elem'>
+        <xpath>//a[@id="bylineInfo"]/text()</xpath>
+    </match>
+    <struct target="product_property_values">
+            <xpath>//div[@id='detail_bullets_id']//table//tr//ul/li</xpath>
+        <match target='name' array_type='elem'>
+                <xpath>./b/text()</xpath>
+                <replace pattern=' '></replace>
+        </match>
+        <match target='value' array_type='elem'>
+                <xpath>./text()</xpath>
+        </match>
+    </struct>
+    <struct target="product_property_values">
+        <xpath>//div[@class='pdTab']/table/tbody/tr</xpath>
+        <match target='name' array_type='elem'>
+                <xpath>./td[@class="label"]/text()</xpath>
+                <replace pattern=' '></replace>
+        </match>
+        <match target='value' array_type='elem'>
+            <xpath>./td[@class="value"]/text()</xpath>
+        </match>
+    </struct>
+    <struct target="seller_list">
+            <xpath>//div[@id='olpOfferListColumn']//div[@class='a-row a-spacing-mini olpOffer']</xpath>
+        <match target='price' array_type='elem'>
+                <xpath>./div[@class="a-column a-span2 olpPriceColumn"]/span/span/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='assured_info' array_type='elem'>
+                <xpath>./div[@class="a-column a-span2 olpPriceColumn"]//i/@aria-label</xpath>
+        </match>
+        <match target='payment_options' array_type='elem'>
+                <xpath>./div[@class="a-column a-span2 olpPriceColumn"]//b/text()</xpath>
+                            <drop_empty></drop_empty>
+            <connect>\n</connect>
+        </match>
+        <match target='seller_name' array_type='elem' limit='1'>
+                <xpath>./div[@class="a-column a-span2 olpSellerColumn"]/h3/span/a/text()</xpath>
+        </match>
+        <match target='seller_url' array_type='elem'>
+                <xpath>./div[@class="a-column a-span2 olpSellerColumn"]/h3/span/a/@href</xpath>
+                <prefix>https://www.amazon.in</prefix>
+        </match>
+        <match target='seller_ratingscore' array_type='elem'>
+                <xpath>./div[@class="a-column a-span2 olpSellerColumn"]/p/i/span/text()</xpath>
+                 <regex  match='findall' connector='@'>([0-9.]+)</regex>
+            <split index='0'>@</split>
+        </match>
+        <match target='seller_ratingcount' array_type='elem'>
+                <xpath>./div[@class="a-column a-span2 olpSellerColumn"]/p/text()</xpath>
+        </match>
+        <match target='deliver' array_type='elem'>
+                <xpath>./div[@class="a-column a-span3 olpDeliveryColumn"]//ul/li/span//text()</xpath>
+                <drop_empty></drop_empty>
+                <connect>\n</connect>
+        </match>
+        <match target='delivery_by' data_type='int' array_type='elem'>
+                <xpath>./div[@class="a-column a-span3 olpDeliveryColumn"]//div[@class="olpImageBadge"]//img/@src</xpath>
+                <length></length>
+        </match>
+        <match target='in_stock' data_type='int' array_type='elem'>
+                <xpath>.//input[@name="submit.addToCart"]/@value</xpath>
+                <length></length>
+        </match>
+</struct>
+    <struct target="seller_list">
+            <xpath>//div[@id='olpOfferList']</xpath>
+        <match target='price' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpPriceColumn"]/span/span/text()</xpath>
+                <regex match='findall'>([0-9,.]+)</regex>
+                <replace pattern=','></replace>
+        </match>
+        <match target='assured_info' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpPriceColumn"]//i/@aria-label</xpath>
+        </match>
+        <match target='payment_options' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpPriceColumn"]//b/text()</xpath>
+        </match>
+        <match target='seller_name' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpSellerColumn"]/h3/span/a/text()</xpath>
+        </match>
+        <match target='seller_url' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpSellerColumn"]/h3/span/a/@href</xpath>
+                <prefix>https://www.amazon.in</prefix>
+        </match>
+        <match target='seller_id' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpSellerColumn"]/h3/span/a/@href</xpath>
+                <regex match='search'>(seller=\w+)</regex>
+                <split index='1'>=</split> 
+        </match>
+        <match target='seller_ratingscore' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpSellerColumn"]/p/i/span/text()</xpath>
+                            <regex  match='findall' connector='@'>([0-9.]+)</regex>
+            <split index='0'>@</split>
+        </match>
+        <match target='seller_ratingcount' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span2 olpSellerColumn"]/p/text()</xpath>
+        </match>
+        <match target='deliver' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span3 olpDeliveryColumn"]//ul/li/span//text()</xpath>
+        </match>
+        <match target='delivery_by' array_type='elem'>
+                <xpath>.//div[@class="a-column a-span3 olpDeliveryColumn"]//div[@class="olpImageBadge"]//img/@src</xpath>
+        </match>
+        <match target='in_stock'>
+                <xpath>.//input[@name="submit.addToCart"]/@value</xpath>
+        </match>
+</struct>
+        <struct target='seller_pages'>
+        <xpath>//div[@id="olpOfferListColumn"]//ul[@class="a-pagination"]/li</xpath>
+        <match target='url' array_type='elem'>
+                <xpath>./a/@href</xpath>
+                <prefix>https://www.amazon.in</prefix>
+        </match>
+        <match target='number' array_type='elem'>
+                <xpath>./a/text()</xpath>
+        </match>
+        <match target='selected' array_type='elem'>
+         <xpath>./a/span/text()</xpath>
+        </match>
+        </struct>
+        <match target='product_callback_url' array_type='elem'>
+                <xpath>//div[@id="olpProduct"]//div/a/@href</xpath>
+        </match>
+</template> 

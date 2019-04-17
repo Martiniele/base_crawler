@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template>
+  <encoding>utf8</encoding>
+  <url_pattern>https://www.amazon.in/*</url_pattern>
+  <struct target="item_list">
+          <xpath>//div[@id='mainResults']/ul/li</xpath>
+    <match target='url' array_type='elem'>
+            <xpath>.//a[@class="a-link-normal a-text-normal"]/@href</xpath>
+      <prefix>https://www.amazon.in</prefix>
+    </match>
+    <match target='id' array_type='elem'>
+      <xpath>./@data-asin</xpath>
+    </match>
+    <match target='title' array_type='elem'>
+      <xpath>.//h2/text()</xpath>
+    </match>
+    <match target='prime' array_type='elem'>
+            <xpath>.//i[@aria-label="prime"]/@aria-label</xpath>
+    </match>
+  </struct>
+  <struct target="item_list">
+          <xpath>//div[@id='atfResults']/ul/li</xpath>
+    <match target='url' array_type='elem'>
+            <xpath>.//a[@class="a-link-normal a-text-normal"]/@href</xpath>
+      <prefix>https://www.amazon.in</prefix>
+    </match>
+    <match target='id' array_type='elem'>
+      <xpath>./@data-asin</xpath>
+    </match>
+    <match target='title' array_type='elem'>
+      <xpath>.//h2/text()</xpath>
+    </match>
+    <match target='prime' array_type='elem'>
+            <xpath>.//i[@aria-label="prime"]/@aria-label</xpath>
+    </match>
+  </struct>
+  <match target='next_url' array_type='elem'>
+          <xpath>//span[@class="pagnRA"]/a[@id="pagnNextLink"]/@href</xpath>
+          <prefix>https://www.amazon.in</prefix>
+          <replace pattern="in#/">in/s/</replace>
+          <replace pattern="in/#/">in/s/</replace>
+  </match>
+  <match target='pageCur' data_type='int' array_type='elem'>
+    <xpath>//span[@class="pagnCur"]/text()</xpath>
+  </match>
+  <struct target="pageLink">
+        <xpath>//span[@class="pagnLink"]</xpath>
+        <match target='url' array_type='elem'>
+                <xpath>./a/@href</xpath>
+                <prefix>https://www.amazon.in</prefix>
+                <replace pattern="in#/">in/s/</replace>
+                <replace pattern="in/#/">in/s/</replace>
+        </match>
+        <match target='number' data_type='int' array_type='elem'>
+          <xpath>./a/text()</xpath>
+        </match>   
+  </struct>
+</template>
