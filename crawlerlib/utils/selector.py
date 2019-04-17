@@ -752,7 +752,7 @@ class TemplateParser(object):
             node.show_info()
 
 
-class Xpather:
+class Selector:
     def __init__(self):
         self._template_parser_list = []
 
