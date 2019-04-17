@@ -8,6 +8,7 @@ from datetime import datetime
 import HTMLParser
 import logging
 
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
